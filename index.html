@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ΑΑΔΕ Offline QR Code Generator - Δημιουργία QR codes για παραστατικά">
-    <meta name="theme-color" content="#667eea">
-    <title>ΑΑΔΕ Offline QR Code Generator</title>
+    <title>URL Generator & Converter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     <style>
         body {
@@ -65,26 +63,6 @@
 
         .tab-content.active {
             display: block;
-        }
-
-        .json-upload {
-            border: 3px dashed #667eea;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .json-upload:hover {
-            background: #f8f9fa;
-            border-color: #5a6fd8;
-        }
-
-        .json-upload.dragover {
-            background: #e3f2fd;
-            border-color: #2196f3;
         }
 
         .step {
@@ -218,6 +196,22 @@
             background: #5a6fd8;
         }
 
+        .load-example-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .load-example-btn:hover {
+            background: #218838;
+        }
+
         .success {
             background: #d4edda;
             color: #155724;
@@ -245,6 +239,75 @@
             border-left: 4px solid #17a2b8;
         }
 
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .comparison-side {
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .comparison-side h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .diff-highlight {
+            background: #ffeaa7 !important;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .diff-new {
+            background: #d4edda !important;
+            color: #155724;
+        }
+
+        .diff-removed {
+            background: #f8d7da !important;
+            color: #721c24;
+        }
+
+        .comparison-results {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+        }
+
+        .json-upload {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .json-upload:hover {
+            background: #f8f9fa;
+            border-color: #5a6fd8;
+        }
+
+        .json-upload.dragover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
         .file-input {
             display: none;
         }
@@ -258,98 +321,169 @@
             color: #6c757d;
             font-size: 0.9rem;
         }
-
-        @media (max-width: 768px) {
-            .qr-container {
-                flex-direction: column;
-            }
-            
-            .input-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔐 ΑΑΔΕ Offline QR Code Generator</h1>
+        <h1>🔗 URL Converter</h1>
         
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('manual')">📝 Χειροκίνητη Εισαγωγή</div>
+            <div class="tab active" onclick="switchTab('manual')">📝 Create QR Code</div>
             <div class="tab" onclick="switchTab('json')">📁 JSON Upload</div>
+            <div class="tab" onclick="switchTab('compare')">⚖️ Compare QR Codes</div>
         </div>
 
         <!-- Manual Input Tab -->
         <div id="manual-tab" class="tab-content active">
             <div class="step">
                 <div class="step-title">
+                    <div class="step-number">💡</div>
+                    Load Ready Example
+                </div>
+                <button class="load-example-btn" onclick="loadRealExample()">
+                    🚀 Load Example from your JSON (ΤΔΑ-260028375)
+                </button>
+                <div class="info">
+                    <strong>📋 Example Details:</strong> Issuer: EL154697391 | Recipient: DEMO Customer | Series: ΤΔΑ | Number: 260028375 | Amount: 3120€
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                        <strong>🔍 Expected Result for this example:</strong><br>
+                        <div style="font-family: 'Courier New', monospace; font-size: 11px; margin: 10px 0; padding: 10px; background: white; border-radius: 5px; word-break: break-all;">
+                            <strong>String:</strong> EL154697391-EL110099934-ΤΔΑ-260028375-20250621101302-3120-ΤΔΑX3752025-06-21 10:13:0203ac2ca0-2815-41eb-894f-9d3a80c6c9da<br>
+                            <strong>UTF8 Bytes:</strong> Convert to byte array<br>
+                            <strong>SHA1 Hash:</strong> Apply SHA1 algorithm<br>
+                            <strong>Hex String:</strong> Convert to lowercase hexadecimal (40 chars)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
                     <div class="step-number">1</div>
-                    Εισαγωγή Στοιχείων Παραστατικού
+                    Invoice Data Input
                 </div>
                 
                 <div class="input-grid">
                     <div class="input-group">
-                        <label class="required">IssuerTin (ΑΦΜ Εκδότη):</label>
-                        <input type="text" id="issuerTin" value="EL118058830" placeholder="π.χ. EL118058830">
+                        <label class="required">IssuerTin (Issuer VAT):</label>
+                        <input type="text" id="issuerTin" value="EL154697391" placeholder="e.g. EL154697391">
                     </div>
                     
                     <div class="input-group">
-                        <label>CustomerTin (ΑΦΜ Λήπτη):</label>
-                        <input type="text" id="customerTin" value="EL987654321" placeholder="Κενό για B2C">
+                        <label>CustomerTin (Customer VAT):</label>
+                        <input type="text" id="customerTin" value="EL110099934" placeholder="Empty for B2C">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">CustomerName (Όνομα Λήπτη):</label>
-                        <input type="text" id="customerName" value="Demo Company" placeholder="π.χ. Demo Company">
+                        <label class="required">CustomerName (Customer Name):</label>
+                        <input type="text" id="customerName" value="DEMO Customer" placeholder="e.g. DEMO Customer">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">InvoiceType (Τύπος Παραστατικού):</label>
-                        <input type="text" id="invoiceType" value="1.2" placeholder="π.χ. 1.2">
+                        <label class="required">InvoiceType (Invoice Type):</label>
+                        <input type="text" id="invoiceType" value="1.1" placeholder="e.g. 1.1">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">Series (Σειρά):</label>
-                        <input type="text" id="series" value="ΤΔΑ" placeholder="π.χ. ΤΔΑ">
+                        <label class="required">Series (Invoice Series):</label>
+                        <input type="text" id="series" value="ΤΔΑ" placeholder="e.g. ΤΔΑ">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">Number (Αριθμός):</label>
-                        <input type="text" id="number" value="60" placeholder="π.χ. 60">
+                        <label class="required">Number (Invoice Number):</label>
+                        <input type="text" id="number" value="260028375" placeholder="e.g. 260028375">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">DateIssued (Ημερομηνία Έκδοσης):</label>
-                        <input type="datetime-local" id="dateIssued" value="2022-12-31T14:30:59">
+                        <label class="required">DateIssued (Issue Date):</label>
+                        <input type="datetime-local" id="dateIssued" value="2025-06-21T10:13:02">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">TotalAmount (Συνολικό Ποσό):</label>
-                        <input type="number" id="totalAmount" value="100.50" step="0.01" placeholder="π.χ. 100.50">
+                        <label class="required">TotalAmount (Total Amount):</label>
+                        <input type="number" id="totalAmount" value="3120" step="0.01" placeholder="e.g. 3120">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">TotalNetAmount (Καθαρή Αξία):</label>
-                        <input type="number" id="totalNetAmount" value="80.50" step="0.01" placeholder="π.χ. 80.50">
+                        <label class="required">TotalNetAmount (Net Amount):</label>
+                        <input type="number" id="totalNetAmount" value="3120" step="0.01" placeholder="e.g. 3120">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">TotalVatAmount (ΦΠΑ):</label>
-                        <input type="number" id="totalVatAmount" value="24.58" step="0.01" placeholder="π.χ. 24.58">
+                        <label class="required">TotalVatAmount (VAT Amount):</label>
+                        <input type="number" id="totalVatAmount" value="0" step="0.01" placeholder="e.g. 0">
                     </div>
                     
                     <div class="input-group">
-                        <label class="required">InternalId (Εσωτερικό ID):</label>
-                        <input type="text" id="internalId" value="1.2_ΤΔΑ_60" placeholder="π.χ. 1.2_ΤΔΑ_60">
+                        <label class="required">InternalId (Internal ID):</label>
+                        <input type="text" id="internalId" value="ΤΔΑX3752025-06-21 10:13:02" placeholder="e.g. ΤΔΑX3752025-06-21 10:13:02">
                     </div>
                     
                     <div class="input-group">
                         <label class="required">ApiSecretKey:</label>
-                        <input type="text" id="apiSecretKey" value="0383223f-06ff4e7c-bd36-29a1acdb41b0" placeholder="API Secret Key">
+                        <input type="text" id="apiSecretKey" value="03ac2ca0-2815-41eb-894f-9d3a80c6c9da" placeholder="API Secret Key">
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <div class="step-number">2</div>
+                    Signature Calculation - Detailed Steps
+                </div>
+                
+                <div style="display: grid; gap: 20px;">
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                        <h4 style="margin: 0 0 10px 0; color: #1565c0;">📋 Step 1: Create String</h4>
+                        <div style="font-family: 'Courier New', monospace; background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                            <strong>Format:</strong> {issuerTin}-{customerTin}-{series}-{number}-{dateIssued}-{totalAmount}-{internalId}{APIKey}
+                        </div>
+                        <div class="output" id="step1Result"></div>
+                    </div>
+
+                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                        <h4 style="margin: 0 0 10px 0; color: #7b1fa2;">🔧 Step 2: Convert to UTF-8 Byte Array</h4>
+                        <div class="output" id="step2Result"></div>
+                    </div>
+
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                        <h4 style="margin: 0 0 10px 0; color: #2e7d32;">🔐 Step 3: SHA1 Hash Calculation</h4>
+                        <div class="output" id="step3Result"></div>
+                    </div>
+
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                        <h4 style="margin: 0 0 10px 0; color: #ef6c00;">✨ Step 4: Final Hexadecimal String</h4>
+                        <div class="output" id="step4Result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <div class="step-number">3</div>
+                    Generate Offline QR Code URL
+                </div>
+                <div class="qr-container">
+                    <div class="url-section">
+                        <div class="output" id="generatedUrl"></div>
+                        <button class="copy-btn" onclick="copyUrl()">📋 Copy URL</button>
+                        <button class="copy-btn" onclick="downloadQR('main')">💾 Download QR</button>
+                        <button class="copy-btn" onclick="saveForComparison('A')" style="background: #dc3545;">💾 Save for Comparison A</button>
+                    </div>
+                    <div class="qr-code">
+                        <div style="margin-bottom: 15px; font-weight: bold;">QR Code:</div>
+                        <canvas id="qrCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="final-result">
+                <div style="text-align: center;">
+                    <strong>🎯 OFFLINE QR CODE READY!</strong>
+                    <div style="margin-top: 15px;">
+                        <button class="copy-btn" onclick="copyUrl()" style="background: rgba(255,255,255,0.2);">📋 Copy URL</button>
+                        <button class="copy-btn" onclick="downloadQR('main')" style="background: rgba(255,255,255,0.2);">💾 Download QR Code</button>
                     </div>
                 </div>
             </div>
@@ -360,75 +494,126 @@
             <div class="step">
                 <div class="step-title">
                     <div class="step-number">1</div>
-                    Upload JSON Αρχείο
+                    Upload JSON File
                 </div>
                 
                 <div class="json-upload" id="jsonUpload">
-                    <div class="upload-text">📁 Σύρετε και αφήστε το JSON αρχείο εδώ</div>
-                    <div class="upload-subtext">ή κάντε κλικ για επιλογή αρχείου</div>
+                    <div class="upload-text">📁 Drag and drop your JSON file here</div>
+                    <div class="upload-subtext">or click to select file</div>
                     <input type="file" id="fileInput" class="file-input" accept=".json" />
+                    
+                    <div style="margin-top: 20px;">
+                        <button class="copy-btn" onclick="loadDemoData()" style="background: #28a745;">
+                            🚀 Try with Demo JSON (Complex ΑΑΔΕ Structure)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <strong>🤖 Supported JSON Formats:</strong>
+                    
+                    <details style="margin: 15px 0;">
+                        <summary style="cursor: pointer; font-weight: bold; color: #667eea;">📋 Simple JSON Format</summary>
+                        <pre style="margin: 10px 0; font-size: 11px; background: #f1f3f4; padding: 10px; border-radius: 5px;">{
+  "issuerTin": "EL154697391",
+  "customerTin": "EL110099934", 
+  "customerName": "DEMO Customer",
+  "invoiceType": "1.1",
+  "series": "ΤΔΑ",
+  "number": "260028375",
+  "dateIssued": "2025-06-21T10:13:02",
+  "totalAmount": 3120,
+  "totalNetAmount": 3120,
+  "totalVatAmount": 0,
+  "internalId": "ΤΔΑX3752025-06-21 10:13:02",
+  "apiSecretKey": "03ac2ca0-2815-41eb-894f-9d3a80c6c9da"
+}</pre>
+                    </details>
+
+                    <details style="margin: 15px 0;">
+                        <summary style="cursor: pointer; font-weight: bold; color: #667eea;">🏢 Complex ΑΑΔΕ JSON Format</summary>
+                        <pre style="margin: 10px 0; font-size: 11px; background: #f1f3f4; padding: 10px; border-radius: 5px;">{
+  "APIKEY": "03ac2ca0-2815-41eb-894f-9d3a80c6c9da",
+  "InvoiceTypeCode": "1.1",
+  "Series": "ΤΔΑ", 
+  "Number": "260028375",
+  "DateIssued": "2025-06-21T10:13:02",
+  "Issuer": { "Vat": "EL154697391" },
+  "CounterParty": {
+    "RegisteredName": "DEMO Customer",
+    "Vat": "EL110099934"
+  },
+  "DistributionDetails": {
+    "InternalDocumentId": "ΤΔΑX3752025-06-21 10:13:02"
+  },
+  "Summaries": {
+    "TotalPayableAmount": 3120,
+    "TotalNetAmount": 3120,
+    "TotalVATAmount": 0
+  }
+}</pre>
+                    </details>
+
+                    <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; margin-top: 15px;">
+                        <strong>💡 Smart Analysis:</strong> The system automatically recognizes JSON structure and identifies required fields!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Tab -->
+        <div id="compare-tab" class="tab-content">
+            <div class="step">
+                <div class="step-title">
+                    <div class="step-number">⚖️</div>
+                    Compare Offline QR Codes
                 </div>
                 
-                <div class="info">
-                    <strong>Παράδειγμα JSON structure:</strong>
-                    <pre style="margin: 10px 0; font-size: 12px;">{
-  "issuerTin": "EL118058830",
-  "customerTin": "EL987654321",
-  "customerName": "Demo Company",
-  "invoiceType": "1.2",
-  "series": "ΤΔΑ",
-  "number": "60",
-  "dateIssued": "2022-12-31T14:30:59",
-  "totalAmount": 100.50,
-  "totalNetAmount": 80.50,
-  "totalVatAmount": 24.58,
-  "internalId": "1.2_ΤΔΑ_60",
-  "apiSecretKey": "0383223f-06ff4e7c-bd36-29a1acdb41b0"
-}</pre>
+                <div class="comparison-container">
+                    <div class="comparison-side">
+                        <h3>🅰️ QR Code A</h3>
+                        <div class="input-group">
+                            <label>URL or Data A:</label>
+                            <textarea id="compareDataA" rows="8" placeholder="Paste here the URL or data of QR Code A..."></textarea>
+                        </div>
+                        <button class="copy-btn" onclick="parseQRData('A')" style="background: #17a2b8; width: 100%;">🔍 Analyze Data A</button>
+                        <div class="qr-code" style="margin-top: 15px;">
+                            <canvas id="qrCanvasA" style="max-width: 200px;"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-side">
+                        <h3>🅱️ QR Code B</h3>
+                        <div class="input-group">
+                            <label>URL or Data B:</label>
+                            <textarea id="compareDataB" rows="8" placeholder="Paste here the URL or data of QR Code B..."></textarea>
+                        </div>
+                        <button class="copy-btn" onclick="parseQRData('B')" style="background: #17a2b8; width: 100%;">🔍 Analyze Data B</button>
+                        <div class="qr-code" style="margin-top: 15px;">
+                            <canvas id="qrCanvasB" style="max-width: 200px;"></canvas>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Common Results Section -->
-        <div class="step">
-            <div class="step-title">
-                <div class="step-number">2</div>
-                Υπολογισμός Signature
-            </div>
-            <div class="output" id="signatureCalculation"></div>
-        </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="copy-btn" onclick="compareQRCodes()" style="background: #e74c3c; font-size: 18px; padding: 15px 30px;">
+                        ⚖️ COMPARE QR CODES
+                    </button>
+                    <button class="copy-btn" onclick="loadExampleComparison()" style="background: #f39c12;">
+                        📋 Load Comparison Example
+                    </button>
+                </div>
 
-        <div class="step">
-            <div class="step-title">
-                <div class="step-number">3</div>
-                Δημιουργία Offline QR Code URL
-            </div>
-            <div class="qr-container">
-                <div class="url-section">
-                    <div class="output" id="generatedUrl"></div>
-                    <button class="copy-btn" onclick="copyUrl()">📋 Αντιγραφή URL</button>
-                    <button class="copy-btn" onclick="downloadQR()">💾 Download QR</button>
-                </div>
-                <div class="qr-code">
-                    <div style="margin-bottom: 15px; font-weight: bold;">QR Code:</div>
-                    <canvas id="qrCanvas"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="final-result">
-            <div style="text-align: center;">
-                <strong>🎯 ΕΤΟΙΜΟ OFFLINE QR CODE!</strong>
-                <div style="margin-top: 15px;">
-                    <button class="copy-btn" onclick="copyUrl()" style="background: rgba(255,255,255,0.2);">📋 Αντιγραφή URL</button>
-                    <button class="copy-btn" onclick="downloadQR()" style="background: rgba(255,255,255,0.2);">💾 Download QR Code</button>
-                </div>
+                <div id="comparisonResults"></div>
             </div>
         </div>
     </div>
 
     <script>
         let currentUrl = '';
+        let savedComparisons = { A: null, B: null };
+        let parsedDataA = null;
+        let parsedDataB = null;
 
         function switchTab(tab) {
             // Remove active class from all tabs and contents
@@ -465,23 +650,96 @@
                                      date.getMinutes().toString().padStart(2, '0') +
                                      date.getSeconds().toString().padStart(2, '0');
 
-                // Δημιουργία signature string
+                // === ΒΗΜΑ 1: Δημιουργία String ===
                 const signatureInput = `${issuerTin}-${customerTin}-${series}-${number}-${formattedDate}-${totalAmount}-${internalId}`;
-                const stringWithSalt = signatureInput + apiSecretKey;
+                const finalString = signatureInput + apiSecretKey;
+                
+                document.getElementById('step1Result').innerHTML = `
+                    <div style="margin-bottom: 10px;"><strong>Parameters:</strong></div>
+                    <div style="font-size: 13px; line-height: 1.6;">
+                        • issuerTin: <span style="color: #1976d2; font-weight: bold;">${issuerTin}</span><br>
+                        • customerTin: <span style="color: #1976d2; font-weight: bold;">${customerTin}</span><br>
+                        • series: <span style="color: #1976d2; font-weight: bold;">${series}</span><br>
+                        • number: <span style="color: #1976d2; font-weight: bold;">${number}</span><br>
+                        • dateIssued: <span style="color: #1976d2; font-weight: bold;">${formattedDate}</span> (from ${dateIssued})<br>
+                        • totalAmount: <span style="color: #1976d2; font-weight: bold;">${totalAmount}</span><br>
+                        • internalId: <span style="color: #1976d2; font-weight: bold;">${internalId}</span><br>
+                        • APIKey: <span style="color: #1976d2; font-weight: bold;">${apiSecretKey}</span>
+                    </div>
+                    <div style="margin: 15px 0;"><strong>Final String:</strong></div>
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; word-break: break-all; font-family: 'Courier New', monospace;">
+                        ${finalString}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        <strong>Length:</strong> ${finalString.length} characters
+                    </div>
+                `;
 
-                // SHA1 Hash
+                // === ΒΗΜΑ 2: UTF-8 Byte Array ===
                 const encoder = new TextEncoder();
-                const utf8Bytes = encoder.encode(stringWithSalt);
+                const utf8Bytes = encoder.encode(finalString);
+                
+                document.getElementById('step2Result').innerHTML = `
+                    <div style="margin-bottom: 10px;"><strong>UTF-8 Encoding:</strong></div>
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+                        <div style="font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.4;">
+                            <strong>Byte Array (${utf8Bytes.length} bytes):</strong><br>
+                            [${Array.from(utf8Bytes).slice(0, 50).join(', ')}${utf8Bytes.length > 50 ? ', ...' : ''}]
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 12px;">
+                            <div><strong>Total Bytes:</strong> ${utf8Bytes.length}</div>
+                            <div><strong>First 10 bytes:</strong> [${Array.from(utf8Bytes).slice(0, 10).join(', ')}]</div>
+                            <div><strong>Last 10 bytes:</strong> [${Array.from(utf8Bytes).slice(-10).join(', ')}]</div>
+                        </div>
+                    </div>
+                `;
+
+                // === ΒΗΜΑ 3: SHA1 Hash ===
                 const hashBuffer = await crypto.subtle.digest('SHA-1', utf8Bytes);
                 const hashArray = new Uint8Array(hashBuffer);
+                
+                document.getElementById('step3Result').innerHTML = `
+                    <div style="margin-bottom: 10px;"><strong>SHA1 Hash Calculation:</strong></div>
+                    <div style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+                        <div style="font-family: 'Courier New', monospace; font-size: 11px; line-height: 1.4;">
+                            <strong>SHA1 Hash Bytes (${hashArray.length} bytes):</strong><br>
+                            [${Array.from(hashArray).join(', ')}]
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        <strong>Algorithm:</strong> SHA-1<br>
+                        <strong>Output length:</strong> 160 bits = 20 bytes = 40 hex characters
+                    </div>
+                `;
+
+                // === ΒΗΜΑ 4: Hexadecimal String ===
                 const signature = Array.from(hashArray)
                     .map(byte => byte.toString(16).padStart(2, '0'))
                     .join('');
 
-                document.getElementById('signatureCalculation').innerHTML = `
-                    <strong>Input String:</strong> ${signatureInput}<br>
-                    <strong>With Salt:</strong> ${stringWithSalt}<br>
-                    <strong>SHA1 Signature:</strong> ${signature}
+                document.getElementById('step4Result').innerHTML = `
+                    <div style="margin-bottom: 10px;"><strong>Final Signature (Hexadecimal):</strong></div>
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center;">
+                        <div style="font-family: 'Courier New', monospace; font-size: 16px; font-weight: bold; color: #d32f2f; word-break: break-all;">
+                            ${signature}
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 12px;">
+                            <div><strong>Length:</strong> ${signature.length} characters</div>
+                            <div><strong>Format:</strong> lowercase hex</div>
+                            <div><strong>Charset:</strong> [0-9a-f]</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                        <strong>✅ Verification for this specific example:</strong><br>
+                        <span style="font-size: 11px; color: #2e7d32;">
+                            Input: EL154697391-EL110099934-ΤΔΑ-260028375-20250621101302-3120-ΤΔΑX3752025-06-21 10:13:0203ac2ca0-2815-41eb-894f-9d3a80c6c9da<br>
+                            <strong>Expected SHA1:</strong> <span id="expectedHash" style="font-family: 'Courier New', monospace; background: white; padding: 2px 5px; border-radius: 3px;"></span>
+                        </span>
+                    </div>
                 `;
 
                 // Δημιουργία URL
@@ -505,19 +763,47 @@
                 document.getElementById('generatedUrl').textContent = currentUrl;
 
                 // Δημιουργία QR Code
-                await generateQRCode(currentUrl);
+                await generateQRCode(currentUrl, 'qrCanvas');
+
+                // Calculate expected hash for verification
+                await calculateExpectedHash();
 
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('signatureCalculation').innerHTML = `<span style="color: red;">Σφάλμα: ${error.message}</span>`;
+                // Display error in all steps
+                const errorMsg = `<span style="color: red;">Error: ${error.message}</span>`;
+                document.getElementById('step1Result').innerHTML = errorMsg;
+                document.getElementById('step2Result').innerHTML = errorMsg;
+                document.getElementById('step3Result').innerHTML = errorMsg;
+                document.getElementById('step4Result').innerHTML = errorMsg;
             }
         }
 
-        async function generateQRCode(url) {
-            const canvas = document.getElementById('qrCanvas');
+        async function calculateExpectedHash() {
+            // Calculate the expected hash for the specific example
+            const exampleString = "EL154697391-EL110099934-ΤΔΑ-260028375-20250621101302-3120-ΤΔΑX3752025-06-21 10:13:0203ac2ca0-2815-41eb-894f-9d3a80c6c9da";
+            
+            const encoder = new TextEncoder();
+            const utf8Bytes = encoder.encode(exampleString);
+            const hashBuffer = await crypto.subtle.digest('SHA-1', utf8Bytes);
+            const hashArray = new Uint8Array(hashBuffer);
+            const expectedHash = Array.from(hashArray)
+                .map(byte => byte.toString(16).padStart(2, '0'))
+                .join('');
+                
+            const expectedHashElement = document.getElementById('expectedHash');
+            if (expectedHashElement) {
+                expectedHashElement.textContent = expectedHash;
+            }
+        }
+
+        async function generateQRCode(url, canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
             try {
                 await QRCode.toCanvas(canvas, url, {
-                    width: 256,
+                    width: canvasId.includes('Canvas') && !canvasId.includes('main') ? 200 : 256,
                     margin: 2,
                     color: {
                         dark: '#000000',
@@ -531,19 +817,226 @@
 
         function copyUrl() {
             navigator.clipboard.writeText(currentUrl).then(() => {
-                showNotification('✅ URL αντιγράφηκε στο clipboard!', 'success');
+                showNotification('✅ URL copied to clipboard!', 'success');
             }).catch(err => {
-                showNotification('❌ Σφάλμα κατά την αντιγραφή', 'error');
+                showNotification('❌ Error copying URL', 'error');
             });
         }
 
-        function downloadQR() {
-            const canvas = document.getElementById('qrCanvas');
+        function downloadQR(type = 'main') {
+            const canvasId = type === 'main' ? 'qrCanvas' : `qrCanvas${type.toUpperCase()}`;
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
             const link = document.createElement('a');
-            link.download = 'qr-code.png';
+            link.download = `qr-code-${type}.png`;
             link.href = canvas.toDataURL();
             link.click();
-            showNotification('💾 QR Code έγινε download!', 'success');
+            showNotification(`💾 QR Code ${type} downloaded!`, 'success');
+        }
+
+        function saveForComparison(slot) {
+            if (!currentUrl) {
+                showNotification('❌ No QR Code to save', 'error');
+                return;
+            }
+            
+            savedComparisons[slot] = {
+                url: currentUrl,
+                data: getCurrentFormData()
+            };
+            showNotification(`✅ QR Code saved to slot ${slot}`, 'success');
+        }
+
+        function getCurrentFormData() {
+            return {
+                issuerTin: document.getElementById('issuerTin').value,
+                customerTin: document.getElementById('customerTin').value,
+                customerName: document.getElementById('customerName').value,
+                invoiceType: document.getElementById('invoiceType').value,
+                series: document.getElementById('series').value,
+                number: document.getElementById('number').value,
+                dateIssued: document.getElementById('dateIssued').value,
+                totalAmount: document.getElementById('totalAmount').value,
+                totalNetAmount: document.getElementById('totalNetAmount').value,
+                totalVatAmount: document.getElementById('totalVatAmount').value,
+                internalId: document.getElementById('internalId').value,
+                apiSecretKey: document.getElementById('apiSecretKey').value
+            };
+        }
+
+        function parseQRData(slot) {
+            const textarea = document.getElementById(`compareData${slot}`);
+            const data = textarea.value.trim();
+            
+            if (!data) {
+                showNotification(`❌ Please enter data for QR Code ${slot}`, 'error');
+                return;
+            }
+
+            try {
+                let parsedData = {};
+                
+                if (data.startsWith('http')) {
+                    // Parse URL parameters
+                    const url = new URL(data);
+                    const params = new URLSearchParams(url.search);
+                    
+                    parsedData = {
+                        IssuerTin: params.get('IssuerTin') || '',
+                        CustomerTin: params.get('CustomerTin') || '',
+                        CustomerName: params.get('CustomerName') || '',
+                        InvoiceType: params.get('InvoiceType') || '',
+                        Series: params.get('Series') || '',
+                        Number: params.get('Number') || '',
+                        DateIssued: params.get('DateIssued') || '',
+                        TotalAmount: params.get('TotalAmount') || '',
+                        TotalNetAmount: params.get('TotalNetAmount') || '',
+                        TotalVatAmount: params.get('TotalVatAmount') || '',
+                        InternalId: params.get('InternalId') || '',
+                        Signature: params.get('Signature') || ''
+                    };
+                } else {
+                    // Try to parse as JSON
+                    parsedData = JSON.parse(data);
+                }
+
+                if (slot === 'A') {
+                    parsedDataA = parsedData;
+                } else {
+                    parsedDataB = parsedData;
+                }
+
+                // Generate QR code for comparison
+                generateQRCode(data, `qrCanvas${slot}`);
+                
+                showNotification(`✅ Data ${slot} analyzed successfully`, 'success');
+
+            } catch (error) {
+                showNotification(`❌ Error analyzing data ${slot}: ${error.message}`, 'error');
+            }
+        }
+
+        function compareQRCodes() {
+            if (!parsedDataA || !parsedDataB) {
+                showNotification('❌ Please analyze both QR Codes first', 'error');
+                return;
+            }
+
+            const comparison = generateComparison(parsedDataA, parsedDataB);
+            displayComparisonResults(comparison);
+        }
+
+        function generateComparison(dataA, dataB) {
+            const allKeys = new Set([...Object.keys(dataA), ...Object.keys(dataB)]);
+            const differences = [];
+            const similarities = [];
+
+            allKeys.forEach(key => {
+                const valueA = dataA[key];
+                const valueB = dataB[key];
+
+                if (valueA !== valueB) {
+                    differences.push({
+                        field: key,
+                        valueA: valueA || 'N/A',
+                        valueB: valueB || 'N/A'
+                    });
+                } else {
+                    similarities.push({
+                        field: key,
+                        value: valueA
+                    });
+                }
+            });
+
+            return { differences, similarities };
+        }
+
+        function displayComparisonResults(comparison) {
+            const resultsDiv = document.getElementById('comparisonResults');
+            
+            const differencesHtml = comparison.differences.length > 0 ? 
+                comparison.differences.map(diff => `
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold;">${diff.field}</td>
+                        <td style="padding: 8px; background: #f8d7da; color: #721c24;">${diff.valueA}</td>
+                        <td style="padding: 8px; background: #d4edda; color: #155724;">${diff.valueB}</td>
+                    </tr>
+                `).join('') : '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #28a745;">✅ No differences found!</td></tr>';
+
+            const similaritiesHtml = comparison.similarities.length > 0 ?
+                comparison.similarities.map(sim => `
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold;">${sim.field}</td>
+                        <td style="padding: 8px;" colspan="2">${sim.value}</td>
+                    </tr>
+                `).join('') : '<tr><td colspan="3" style="text-align: center; padding: 20px;">No similarities</td></tr>';
+
+            resultsDiv.innerHTML = `
+                <div class="comparison-results">
+                    <h3 style="color: #e74c3c; margin-top: 0;">⚠️ Differences (${comparison.differences.length})</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 10px; text-align: left; border: 1px solid #dee2e6;">Field</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #dee2e6;">QR Code A</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #dee2e6;">QR Code B</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${differencesHtml}
+                        </tbody>
+                    </table>
+
+                    <h3 style="color: #28a745; margin-top: 0;">✅ Similarities (${comparison.similarities.length})</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 10px; text-align: left; border: 1px solid #dee2e6;">Field</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #dee2e6;" colspan="2">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${similaritiesHtml}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function loadExampleComparison() {
+            // Load two slightly different examples for comparison
+            const dataA = "https://einvoiceportaluat.impact.gr/TransmissionFailure?IssuerTin=EL154697391&CustomerTin=EL110099934&CustomerName=DEMO+Customer&InvoiceType=1.1&Series=%CE%A4%CE%94%CE%91&Number=260028375&DateIssued=20250621101302&TotalAmount=3120&TotalNetAmount=3120&TotalVatAmount=0&InternalId=%CE%A4%CE%94%CE%91X3752025-06-21+10%3A13%3A02&Signature=abcdef123456";
+            
+            const dataB = "https://einvoiceportaluat.impact.gr/TransmissionFailure?IssuerTin=EL154697391&CustomerTin=EL110099934&CustomerName=DEMO+Customer&InvoiceType=1.1&Series=%CE%A4%CE%94%CE%91&Number=260028376&DateIssued=20250621101302&TotalAmount=3150&TotalNetAmount=3150&TotalVatAmount=0&InternalId=%CE%A4%CE%94%CE%91X3752025-06-21+10%3A13%3A02&Signature=fedcba654321";
+
+            document.getElementById('compareDataA').value = dataA;
+            document.getElementById('compareDataB').value = dataB;
+
+            parseQRData('A');
+            parseQRData('B');
+
+            showNotification('📋 Comparison example loaded!', 'success');
+        }
+
+        function loadRealExample() {
+            // Load the real example from your JSON
+            document.getElementById('issuerTin').value = "EL154697391";
+            document.getElementById('customerTin').value = "EL110099934";
+            document.getElementById('customerName').value = "DEMO Customer";
+            document.getElementById('invoiceType').value = "1.1";
+            document.getElementById('series').value = "ΤΔΑ";
+            document.getElementById('number').value = "260028375";
+            document.getElementById('dateIssued').value = "2025-06-21T10:13:02";
+            document.getElementById('totalAmount').value = "3120";
+            document.getElementById('totalNetAmount').value = "3120";
+            document.getElementById('totalVatAmount').value = "0";
+            document.getElementById('internalId').value = "ΤΔΑX3752025-06-21 10:13:02";
+            document.getElementById('apiSecretKey').value = "03ac2ca0-2815-41eb-894f-9d3a80c6c9da";
+
+            calculateSignature();
+            showNotification('🚀 Ready example loaded! See detailed steps in "Step 2 - Signature Calculation".', 'success');
         }
 
         function showNotification(message, type) {
@@ -570,6 +1063,8 @@
             const uploadArea = document.getElementById('jsonUpload');
             const fileInput = document.getElementById('fileInput');
 
+            if (!uploadArea || !fileInput) return;
+
             uploadArea.addEventListener('click', () => fileInput.click());
 
             uploadArea.addEventListener('dragover', (e) => {
@@ -594,7 +1089,7 @@
 
         function handleFile(file) {
             if (!file || !file.name.endsWith('.json')) {
-                showNotification('❌ Παρακαλώ επιλέξτε ένα JSON αρχείο', 'error');
+                showNotification('❌ Please select a JSON file', 'error');
                 return;
             }
 
@@ -603,44 +1098,114 @@
                 try {
                     const jsonData = JSON.parse(e.target.result);
                     populateFields(jsonData);
-                    showNotification('✅ JSON αρχείο φορτώθηκε επιτυχώς!', 'success');
+                    showNotification('✅ JSON file loaded successfully!', 'success');
                     
                     // Switch to manual tab to show populated fields
                     switchTab('manual');
                     document.querySelector('.tab').classList.remove('active');
                     document.querySelectorAll('.tab')[0].classList.add('active');
                 } catch (error) {
-                    showNotification('❌ Μη έγκυρο JSON αρχείο', 'error');
+                    showNotification('❌ Invalid JSON file', 'error');
                 }
             };
             reader.readAsText(file);
         }
 
         function populateFields(data) {
-            const fieldMap = {
-                'issuerTin': 'issuerTin',
-                'customerTin': 'customerTin',
-                'customerName': 'customerName',
-                'invoiceType': 'invoiceType',
-                'series': 'series',
-                'number': 'number',
-                'dateIssued': 'dateIssued',
-                'totalAmount': 'totalAmount',
-                'totalNetAmount': 'totalNetAmount',
-                'totalVatAmount': 'totalVatAmount',
-                'internalId': 'internalId',
-                'apiSecretKey': 'apiSecretKey'
-            };
+            let extractedData = {};
+            let analysisLog = [];
 
-            Object.keys(fieldMap).forEach(field => {
-                const element = document.getElementById(fieldMap[field]);
-                if (element && data[field] !== undefined) {
-                    element.value = data[field];
+            // Smart JSON Analysis - Detect field structure automatically
+            if (data.Issuer && data.CounterParty && data.Summaries) {
+                // Complex ΑΑΔΕ JSON structure detected
+                analysisLog.push("🔍 Complex ΑΑΔΕ JSON structure detected");
+                
+                extractedData = {
+                    issuerTin: data.Issuer?.Vat || '',
+                    customerTin: data.CounterParty?.Vat || '',
+                    customerName: data.CounterParty?.RegisteredName || '',
+                    invoiceType: data.InvoiceTypeCode || '',
+                    series: data.Series || '',
+                    number: data.Number || '',
+                    dateIssued: data.DateIssued || '',
+                    totalAmount: data.Summaries?.TotalPayableAmount || 0,
+                    totalNetAmount: data.Summaries?.TotalNetAmount || 0,
+                    totalVatAmount: data.Summaries?.TotalVATAmount || 0,
+                    internalId: data.DistributionDetails?.InternalDocumentId || '',
+                    apiSecretKey: data.APIKEY || ''
+                };
+            } else {
+                // Simple direct mapping for basic JSON structure
+                analysisLog.push("🔍 Simple JSON structure detected");
+                
+                const fieldMap = {
+                    'issuerTin': 'issuerTin',
+                    'customerTin': 'customerTin',
+                    'customerName': 'customerName',
+                    'invoiceType': 'invoiceType',
+                    'series': 'series',
+                    'number': 'number',
+                    'dateIssued': 'dateIssued',
+                    'totalAmount': 'totalAmount',
+                    'totalNetAmount': 'totalNetAmount',
+                    'totalVatAmount': 'totalVatAmount',
+                    'internalId': 'internalId',
+                    'apiSecretKey': 'apiSecretKey'
+                };
+
+                Object.keys(fieldMap).forEach(field => {
+                    if (data[field] !== undefined) {
+                        extractedData[fieldMap[field]] = data[field];
+                        analysisLog.push(`✅ ${field}: ${data[field]}`);
+                    } else {
+                        analysisLog.push(`❌ ${field}: NOT FOUND`);
+                    }
+                });
+            }
+
+            // Populate form fields
+            Object.keys(extractedData).forEach(field => {
+                const element = document.getElementById(field);
+                if (element && extractedData[field] !== undefined && extractedData[field] !== '') {
+                    element.value = extractedData[field];
                 }
             });
 
             // Trigger calculation after populating fields
             setTimeout(calculateSignature, 100);
+        }
+
+        function loadDemoData() {
+            const demoJsonData = {
+                "APIKEY": "03ac2ca0-2815-41eb-894f-9d3a80c6c9da",
+                "InvoiceTypeCode": "1.1",
+                "Series": "ΤΔΑ",
+                "Number": "260028375",
+                "DateIssued": "2025-06-21T10:13:02",
+                "Issuer": {
+                    "Vat": "EL154697391"
+                },
+                "CounterParty": {
+                    "RegisteredName": "DEMO Customer",
+                    "Vat": "EL110099934"
+                },
+                "DistributionDetails": {
+                    "InternalDocumentId": "ΤΔΑX3752025-06-21 10:13:02"
+                },
+                "Summaries": {
+                    "TotalPayableAmount": 3120,
+                    "TotalNetAmount": 3120,
+                    "TotalVATAmount": 0
+                }
+            };
+
+            populateFields(demoJsonData);
+            showNotification('🚀 Demo data loaded successfully!', 'success');
+            
+            // Switch to manual tab to show populated fields
+            switchTab('manual');
+            document.querySelector('.tab').classList.remove('active');
+            document.querySelectorAll('.tab')[0].classList.add('active');
         }
 
         // Event listeners
