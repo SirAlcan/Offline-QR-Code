@@ -1,1 +1,662 @@
-# Offline-QR-Code
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ΑΑΔΕ Offline QR Code Generator - Δημιουργία QR codes για παραστατικά">
+    <meta name="theme-color" content="#667eea">
+    <title>ΑΑΔΕ Offline QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #e9ecef;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .json-upload {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .json-upload:hover {
+            background: #f8f9fa;
+            border-color: #5a6fd8;
+        }
+
+        .json-upload.dragover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .step {
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .required::after {
+            content: "*";
+            color: #e74c3c;
+        }
+
+        .input-group input, .input-group textarea {
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .output {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            border-left: 4px solid #667eea;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .qr-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .url-section {
+            flex: 1;
+        }
+
+        .final-result {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .qr-container {
+                flex-direction: column;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 ΑΑΔΕ Offline QR Code Generator</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('manual')">📝 Χειροκίνητη Εισαγωγή</div>
+            <div class="tab" onclick="switchTab('json')">📁 JSON Upload</div>
+        </div>
+
+        <!-- Manual Input Tab -->
+        <div id="manual-tab" class="tab-content active">
+            <div class="step">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    Εισαγωγή Στοιχείων Παραστατικού
+                </div>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label class="required">IssuerTin (ΑΦΜ Εκδότη):</label>
+                        <input type="text" id="issuerTin" value="EL118058830" placeholder="π.χ. EL118058830">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>CustomerTin (ΑΦΜ Λήπτη):</label>
+                        <input type="text" id="customerTin" value="EL987654321" placeholder="Κενό για B2C">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">CustomerName (Όνομα Λήπτη):</label>
+                        <input type="text" id="customerName" value="Demo Company" placeholder="π.χ. Demo Company">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">InvoiceType (Τύπος Παραστατικού):</label>
+                        <input type="text" id="invoiceType" value="1.2" placeholder="π.χ. 1.2">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">Series (Σειρά):</label>
+                        <input type="text" id="series" value="ΤΔΑ" placeholder="π.χ. ΤΔΑ">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">Number (Αριθμός):</label>
+                        <input type="text" id="number" value="60" placeholder="π.χ. 60">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">DateIssued (Ημερομηνία Έκδοσης):</label>
+                        <input type="datetime-local" id="dateIssued" value="2022-12-31T14:30:59">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">TotalAmount (Συνολικό Ποσό):</label>
+                        <input type="number" id="totalAmount" value="100.50" step="0.01" placeholder="π.χ. 100.50">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">TotalNetAmount (Καθαρή Αξία):</label>
+                        <input type="number" id="totalNetAmount" value="80.50" step="0.01" placeholder="π.χ. 80.50">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">TotalVatAmount (ΦΠΑ):</label>
+                        <input type="number" id="totalVatAmount" value="24.58" step="0.01" placeholder="π.χ. 24.58">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">InternalId (Εσωτερικό ID):</label>
+                        <input type="text" id="internalId" value="1.2_ΤΔΑ_60" placeholder="π.χ. 1.2_ΤΔΑ_60">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="required">ApiSecretKey:</label>
+                        <input type="text" id="apiSecretKey" value="0383223f-06ff4e7c-bd36-29a1acdb41b0" placeholder="API Secret Key">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON Upload Tab -->
+        <div id="json-tab" class="tab-content">
+            <div class="step">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    Upload JSON Αρχείο
+                </div>
+                
+                <div class="json-upload" id="jsonUpload">
+                    <div class="upload-text">📁 Σύρετε και αφήστε το JSON αρχείο εδώ</div>
+                    <div class="upload-subtext">ή κάντε κλικ για επιλογή αρχείου</div>
+                    <input type="file" id="fileInput" class="file-input" accept=".json" />
+                </div>
+                
+                <div class="info">
+                    <strong>Παράδειγμα JSON structure:</strong>
+                    <pre style="margin: 10px 0; font-size: 12px;">{
+  "issuerTin": "EL118058830",
+  "customerTin": "EL987654321",
+  "customerName": "Demo Company",
+  "invoiceType": "1.2",
+  "series": "ΤΔΑ",
+  "number": "60",
+  "dateIssued": "2022-12-31T14:30:59",
+  "totalAmount": 100.50,
+  "totalNetAmount": 80.50,
+  "totalVatAmount": 24.58,
+  "internalId": "1.2_ΤΔΑ_60",
+  "apiSecretKey": "0383223f-06ff4e7c-bd36-29a1acdb41b0"
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Results Section -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">2</div>
+                Υπολογισμός Signature
+            </div>
+            <div class="output" id="signatureCalculation"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">3</div>
+                Δημιουργία Offline QR Code URL
+            </div>
+            <div class="qr-container">
+                <div class="url-section">
+                    <div class="output" id="generatedUrl"></div>
+                    <button class="copy-btn" onclick="copyUrl()">📋 Αντιγραφή URL</button>
+                    <button class="copy-btn" onclick="downloadQR()">💾 Download QR</button>
+                </div>
+                <div class="qr-code">
+                    <div style="margin-bottom: 15px; font-weight: bold;">QR Code:</div>
+                    <canvas id="qrCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="final-result">
+            <div style="text-align: center;">
+                <strong>🎯 ΕΤΟΙΜΟ OFFLINE QR CODE!</strong>
+                <div style="margin-top: 15px;">
+                    <button class="copy-btn" onclick="copyUrl()" style="background: rgba(255,255,255,0.2);">📋 Αντιγραφή URL</button>
+                    <button class="copy-btn" onclick="downloadQR()" style="background: rgba(255,255,255,0.2);">💾 Download QR Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUrl = '';
+
+        function switchTab(tab) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+
+        async function calculateSignature() {
+            try {
+                // Συλλογή δεδομένων
+                const issuerTin = document.getElementById('issuerTin').value;
+                const customerTin = document.getElementById('customerTin').value;
+                const customerName = document.getElementById('customerName').value;
+                const invoiceType = document.getElementById('invoiceType').value;
+                const series = document.getElementById('series').value;
+                const number = document.getElementById('number').value;
+                const dateIssued = document.getElementById('dateIssued').value;
+                const totalAmount = document.getElementById('totalAmount').value;
+                const totalNetAmount = document.getElementById('totalNetAmount').value;
+                const totalVatAmount = document.getElementById('totalVatAmount').value;
+                const internalId = document.getElementById('internalId').value;
+                const apiSecretKey = document.getElementById('apiSecretKey').value;
+
+                // Μετατροπή ημερομηνίας σε yyyyMMddHHmmss format
+                const date = new Date(dateIssued);
+                const formattedDate = date.getFullYear().toString() +
+                                     (date.getMonth() + 1).toString().padStart(2, '0') +
+                                     date.getDate().toString().padStart(2, '0') +
+                                     date.getHours().toString().padStart(2, '0') +
+                                     date.getMinutes().toString().padStart(2, '0') +
+                                     date.getSeconds().toString().padStart(2, '0');
+
+                // Δημιουργία signature string
+                const signatureInput = `${issuerTin}-${customerTin}-${series}-${number}-${formattedDate}-${totalAmount}-${internalId}`;
+                const stringWithSalt = signatureInput + apiSecretKey;
+
+                // SHA1 Hash
+                const encoder = new TextEncoder();
+                const utf8Bytes = encoder.encode(stringWithSalt);
+                const hashBuffer = await crypto.subtle.digest('SHA-1', utf8Bytes);
+                const hashArray = new Uint8Array(hashBuffer);
+                const signature = Array.from(hashArray)
+                    .map(byte => byte.toString(16).padStart(2, '0'))
+                    .join('');
+
+                document.getElementById('signatureCalculation').innerHTML = `
+                    <strong>Input String:</strong> ${signatureInput}<br>
+                    <strong>With Salt:</strong> ${stringWithSalt}<br>
+                    <strong>SHA1 Signature:</strong> ${signature}
+                `;
+
+                // Δημιουργία URL
+                const baseUrl = 'https://einvoiceportaluat.impact.gr/TransmissionFailure';
+                const params = new URLSearchParams({
+                    IssuerTin: issuerTin,
+                    CustomerTin: customerTin,
+                    CustomerName: customerName,
+                    InvoiceType: invoiceType,
+                    Series: series,
+                    Number: number,
+                    DateIssued: formattedDate,
+                    TotalAmount: totalAmount,
+                    TotalNetAmount: totalNetAmount,
+                    TotalVatAmount: totalVatAmount,
+                    InternalId: internalId,
+                    Signature: signature
+                });
+
+                currentUrl = `${baseUrl}?${params.toString()}`;
+                document.getElementById('generatedUrl').textContent = currentUrl;
+
+                // Δημιουργία QR Code
+                await generateQRCode(currentUrl);
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('signatureCalculation').innerHTML = `<span style="color: red;">Σφάλμα: ${error.message}</span>`;
+            }
+        }
+
+        async function generateQRCode(url) {
+            const canvas = document.getElementById('qrCanvas');
+            try {
+                await QRCode.toCanvas(canvas, url, {
+                    width: 256,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                });
+            } catch (error) {
+                console.error('QR Code generation error:', error);
+            }
+        }
+
+        function copyUrl() {
+            navigator.clipboard.writeText(currentUrl).then(() => {
+                showNotification('✅ URL αντιγράφηκε στο clipboard!', 'success');
+            }).catch(err => {
+                showNotification('❌ Σφάλμα κατά την αντιγραφή', 'error');
+            });
+        }
+
+        function downloadQR() {
+            const canvas = document.getElementById('qrCanvas');
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            showNotification('💾 QR Code έγινε download!', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = type;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.padding = '15px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        // JSON Upload functionality
+        function setupJsonUpload() {
+            const uploadArea = document.getElementById('jsonUpload');
+            const fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFile(e.dataTransfer.files[0]);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFile(e.target.files[0]);
+            });
+        }
+
+        function handleFile(file) {
+            if (!file || !file.name.endsWith('.json')) {
+                showNotification('❌ Παρακαλώ επιλέξτε ένα JSON αρχείο', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    populateFields(jsonData);
+                    showNotification('✅ JSON αρχείο φορτώθηκε επιτυχώς!', 'success');
+                    
+                    // Switch to manual tab to show populated fields
+                    switchTab('manual');
+                    document.querySelector('.tab').classList.remove('active');
+                    document.querySelectorAll('.tab')[0].classList.add('active');
+                } catch (error) {
+                    showNotification('❌ Μη έγκυρο JSON αρχείο', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function populateFields(data) {
+            const fieldMap = {
+                'issuerTin': 'issuerTin',
+                'customerTin': 'customerTin',
+                'customerName': 'customerName',
+                'invoiceType': 'invoiceType',
+                'series': 'series',
+                'number': 'number',
+                'dateIssued': 'dateIssued',
+                'totalAmount': 'totalAmount',
+                'totalNetAmount': 'totalNetAmount',
+                'totalVatAmount': 'totalVatAmount',
+                'internalId': 'internalId',
+                'apiSecretKey': 'apiSecretKey'
+            };
+
+            Object.keys(fieldMap).forEach(field => {
+                const element = document.getElementById(fieldMap[field]);
+                if (element && data[field] !== undefined) {
+                    element.value = data[field];
+                }
+            });
+
+            // Trigger calculation after populating fields
+            setTimeout(calculateSignature, 100);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup JSON upload
+            setupJsonUpload();
+            
+            // Add event listeners for real-time calculation
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', calculateSignature);
+            });
+            
+            // Initial calculation
+            calculateSignature();
+        });
+    </script>
+</body>
+</html>
